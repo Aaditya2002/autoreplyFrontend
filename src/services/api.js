@@ -17,6 +17,7 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    console.error('Request error:', error);
     return Promise.reject(error);
   }
 );
@@ -25,15 +26,11 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.error('API Error:', error);
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
-      console.error('API Error:', error.response.data);
-      if (error.response.status === 502) {
-        return Promise.reject({ 
-          message: 'Backend server is not responding. Please try again in a few moments.' 
-        });
-      }
+      console.error('Response error:', error.response.data);
       return Promise.reject(error.response.data);
     } else if (error.request) {
       // The request was made but no response was received

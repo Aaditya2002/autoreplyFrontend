@@ -37,7 +37,7 @@ function Login() {
       if (code) {
         try {
           setLoading(true);
-          const { data } = await auth.handleGoogleCallback(code);
+          const { data } = await auth.handleGoogleCallback({ code });
           
           if (data.user) {
             // Store user in localStorage
