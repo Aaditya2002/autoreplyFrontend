@@ -44,7 +44,7 @@ api.interceptors.response.use(
 
 export const auth = {
   getGoogleAuthUrl: () => api.get('/auth/google'),
-  handleGoogleCallback: (code) => api.get(`/auth/google/callback?code=${code}`),
+  handleGoogleCallback: (code) => api.post('/auth/google/callback', { code }),
   logout: () => api.post('/logout'),
 };
 
