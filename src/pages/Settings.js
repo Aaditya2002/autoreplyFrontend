@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import {
   Container,
   Paper,
@@ -15,11 +14,9 @@ import {
   Alert,
 } from '@mui/material';
 import { Save as SaveIcon } from '@mui/icons-material';
-import { updateSettings } from '../store/slices/authSlice';
 import { settings } from '../services/api';
 
 function Settings() {
-  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     manual_review: true,
     response_tone: 'professional',
@@ -56,7 +53,12 @@ function Settings() {
     event.preventDefault();
     try {
       await settings.update(formData);
-      dispatch(updateSettings(formData));
+      // Update user settings in localStorage
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user) {
+        user.manual_review = formData.manual_review;
+        localStorage.setItem('user', JSON.stringify(user));
+      }
       setSuccess(true);
       setError(null);
       setTimeout(() => setSuccess(false), 3000);

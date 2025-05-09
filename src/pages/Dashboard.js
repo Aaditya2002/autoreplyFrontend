@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import {
   Container,
   Paper,
@@ -19,7 +18,15 @@ function Dashboard() {
   const [emailsList, setEmailsList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { user } = useSelector((state) => state.auth);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Get user from localStorage
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   const fetchEmails = async () => {
     try {
@@ -129,7 +136,7 @@ function Dashboard() {
                     startIcon={<SendIcon />}
                     variant="contained"
                     onClick={() => handleSendResponse(email.id, email.ai_response)}
-                    disabled={user.manual_review}
+                    disabled={user?.manual_review}
                   >
                     Send Response
                   </Button>
