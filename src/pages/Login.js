@@ -24,7 +24,9 @@ function Login() {
       const handleCallback = async () => {
         try {
           const { data } = await auth.handleGoogleCallback(code);
+          console.log('OAuth callback response:', data);
           dispatch(loginSuccess(data.user));
+          console.log('User dispatched to Redux:', data.user);
         } catch (error) {
           dispatch(loginFailure(error.message));
         }
