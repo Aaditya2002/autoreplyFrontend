@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import {
   Container,
   Paper,
@@ -20,7 +20,6 @@ import { settings } from '../services/api';
 
 function Settings() {
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
   const [formData, setFormData] = useState({
     manual_review: true,
     response_tone: 'professional',
