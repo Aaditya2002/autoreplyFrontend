@@ -1,19 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
 import { AppBar, Toolbar, Typography, Button, Avatar, Box } from '@mui/material';
-import { logout } from '../store/slices/authSlice';
 import { auth } from '../services/api';
 
 function Navbar() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Get user from localStorage
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   const handleLogout = async () => {
     try {
       await auth.logout();
-      dispatch(logout());
+      localStorage.removeItem('user');
+      setUser(null);
       navigate('/');
     } catch (error) {
       console.error('Logout failed:', error);
@@ -27,7 +33,7 @@ function Navbar() {
           Email Auto-Responder
         </Typography>
         
-        {isAuthenticated && (
+        {user && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Button color="inherit" onClick={() => navigate('/dashboard')}>
               Dashboard
@@ -36,8 +42,8 @@ function Navbar() {
               Settings
             </Button>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Avatar src={user?.profile_pic} alt={user?.name} />
-              <Typography variant="body1">{user?.name}</Typography>
+              <Avatar src={user.profile_pic} alt={user.name} />
+              <Typography variant="body1">{user.name}</Typography>
             </Box>
             <Button color="inherit" onClick={handleLogout}>
               Logout

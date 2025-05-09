@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { useSelector } from 'react-redux';
 
 // Components
 import Navbar from './components/Navbar';
@@ -23,7 +22,15 @@ const theme = createTheme({
 });
 
 function App() {
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Get user from localStorage
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>
@@ -33,15 +40,15 @@ function App() {
         <Routes>
           <Route 
             path="/" 
-            element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} 
+            element={user ? <Navigate to="/dashboard" /> : <Login />} 
           />
           <Route 
             path="/dashboard" 
-            element={isAuthenticated ? <Dashboard /> : <Navigate to="/" />} 
+            element={user ? <Dashboard /> : <Navigate to="/" />} 
           />
           <Route 
             path="/settings" 
-            element={isAuthenticated ? <Settings /> : <Navigate to="/" />} 
+            element={user ? <Settings /> : <Navigate to="/" />} 
           />
         </Routes>
       </Router>

@@ -1,20 +1,23 @@
-import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Container, Box, Typography, Button, Paper } from '@mui/material';
 import { Google as GoogleIcon } from '@mui/icons-material';
-import { loginStart, loginSuccess, loginFailure } from '../store/slices/authSlice';
 import { auth } from '../services/api';
 
 function Login() {
-  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleGoogleLogin = async () => {
     try {
-      dispatch(loginStart());
+      setLoading(true);
+      setError(null);
       const { data } = await auth.getGoogleAuthUrl();
       window.location.href = data.auth_url;
     } catch (error) {
-      dispatch(loginFailure(error.message));
+      setError(error.message);
+      setLoading(false);
     }
   };
 
@@ -23,17 +26,21 @@ function Login() {
     if (code) {
       const handleCallback = async () => {
         try {
+          setLoading(true);
           const { data } = await auth.handleGoogleCallback(code);
-          console.log('OAuth callback response:', data);
-          dispatch(loginSuccess(data.user));
-          console.log('User dispatched to Redux:', data.user);
+          // Store user in localStorage
+          localStorage.setItem('user', JSON.stringify(data.user));
+          // Redirect to dashboard
+          navigate('/dashboard');
         } catch (error) {
-          dispatch(loginFailure(error.message));
+          setError(error.message);
+        } finally {
+          setLoading(false);
         }
       };
       handleCallback();
     }
-  }, [dispatch]);
+  }, [navigate]);
 
   return (
     <Container maxWidth="sm">
@@ -61,14 +68,20 @@ function Login() {
           <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 4 }}>
             Automate your email responses with AI-powered replies
           </Typography>
+          {error && (
+            <Typography color="error" sx={{ mb: 2 }}>
+              {error}
+            </Typography>
+          )}
           <Button
             variant="contained"
             startIcon={<GoogleIcon />}
             onClick={handleGoogleLogin}
             size="large"
             fullWidth
+            disabled={loading}
           >
-            Sign in with Google
+            {loading ? 'Loading...' : 'Sign in with Google'}
           </Button>
         </Paper>
       </Box>
